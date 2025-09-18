@@ -1,7 +1,7 @@
 # Tonnetz
 
 **Описание / Description**  
-Проект WebHexachord — визуализация тональных сеток и взаимодействий.  
+Интерфейс визуализации тональных сеток и взаимодействий аккордов, с возможность воспроизведения MIDI файлов и клавиатуры. 
 
 ---
 
@@ -28,9 +28,10 @@ python -m http.server
 
 ## Ссылки / Links / Credit
 
-* [Оригинальный GitLab WebHexachord репозиторий](https://gitlab.com/Guichaoua/web-hexachord)
-* [Оригинальный GitHub проект IMAGINARY/web-hexachord](https://github.com/IMAGINARY/web-hexachord)
-* [Онлайн версия на GitHub Pages](https://molotovilya.github.io/tonnetz/)
+Изначальная версия проекта взята с форка репозитория:
 
-```
-```
+* [Оригинальный GitHub проект IMAGINARY/web-hexachord](https://github.com/IMAGINARY/web-hexachord)
+
+который дублировал:
+* [Оригинальный GitLab WebHexachord репозиторий](https://gitlab.com/Guichaoua/web-hexachord)
+
