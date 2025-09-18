@@ -1,16 +1,36 @@
 # Tonnetz
 
-**Forked from IMAGINARY/web-hexachord**  
-Mirror of the GitLab WebHexachord repository.
+**Описание / Description**  
+Проект WebHexachord — визуализация тональных сеток и взаимодействий.  
 
 ---
 
-## Использование программного обеспечения (RU)
+## Использование / Using the software
 
-- **Онлайн**: перейдите по ссылке [https://molotovilya.github.io/tonnetz/](https://molotovilya.github.io/tonnetz/)  
+- **Онлайн / Online**: открыть проект в браузере можно по ссылке:  
+[https://molotovilya.github.io/tonnetz/](https://molotovilya.github.io/tonnetz/)
 
-- **Локально, ограниченная поддержка**: клонируйте репозиторий и откройте страницу `index.html`. Некоторые функции (например, загрузка примера MIDI) могут не работать таким образом.  
+- **Локально, ограниченная поддержка / Locally, limited support**:  
+Клонируйте репозиторий и откройте `index.html`. Некоторые функции (например, загрузка примера MIDI) могут не работать.  
 
-- **Локально, полная поддержка**: клонируйте репозиторий и запустите базовый HTTP-сервер в папке проекта, например Python ≥3:  
+- **Локально, полная поддержка / Locally, full support**:  
+Клонируйте репозиторий и запустите базовый HTTP-сервер в папке проекта, например Python ≥3:  
 ```bash
 python -m http.server
+````
+
+Доступ к странице через `http://localhost:8000` с настройками по умолчанию.
+
+* **Действительно локально / Truly locally**:
+  Последние два метода всё ещё требуют подключения к Интернету для загрузки библиотек. Запуск скрипта `cacheLibraries.sh` при подключении к Интернету обеспечит работу сервера в оффлайн режиме.
+
+---
+
+## Ссылки / Links / Credit
+
+* [Оригинальный GitLab WebHexachord репозиторий](https://gitlab.com/Guichaoua/web-hexachord)
+* [Оригинальный GitHub проект IMAGINARY/web-hexachord](https://github.com/IMAGINARY/web-hexachord)
+* [Онлайн версия на GitHub Pages](https://molotovilya.github.io/tonnetz/)
+
+```
+```
