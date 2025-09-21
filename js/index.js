@@ -72,12 +72,23 @@ proto = new Vue({
             //instrument: "acoustic_grand_piano" })
                 //.or(function(){ proto.loaded(); alert('Cannot load MIDI.js!\n' + this.err()); })
                 //.and(function(){ proto.loaded(); }),
-        // Azerty keyboard bindings
-        ascii: JZZ.input.ASCII({
-                W:'C5', S:'C#5', X:'D5', D:'D#5', C:'E5', V:'F5',
-                G:'F#5', B:'G5', H:'Ab5', N:'A5', J:'Bb5', M:'B5'
-                }),
+                
+        // Azerty keyboard bindings (old version)
+        // ascii: JZZ.input.ASCII({
+        //         W:'C5', S:'C#5', X:'D5', D:'D#5', C:'E5', V:'F5',
+        //         G:'F#5', B:'G5', H:'Ab5', N:'A5', J:'Bb5', M:'B5'
+        //         }),
         
+        // QWERTY keyboard bindings - More intuitive layout
+        ascii: JZZ.input.ASCII({
+            // Upper row: White keys (a whole tone scale)
+            A: 'C3', S: 'D3', D: 'E3', F: 'F3', G: 'G3', H: 'A3', J: 'B3', K: 'C4', L: 'D4', 
+            // Lower row: Black keys (the sharps/flats)
+            W: 'C#3', E: 'D#3', T: 'F#3', Y: 'G#3', U: 'A#3', O: 'C#4', P: 'D#4'
+        }),
+
+
+
         // Should trajectory drawing be active?
         trace: false,
         // The localisation strings
