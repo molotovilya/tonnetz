@@ -1,0 +1,24 @@
+
+
+
+
+
+# Начинаем работу
+git checkout main 
+git pull origin main
+git checkout -b test
+
+# Работа в ветке
+git add .
+git commit -m "   "
+git push origin test
+
+# Когда работа завершена - слить изменения 
+git checkout main
+git pull origin main
+git merge feature/new-design
+git push origin main
+
+# Убираем за собой
+git branch -d test
+git push origin --delete test

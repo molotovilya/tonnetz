@@ -72,13 +72,9 @@ proto = new Vue({
             //instrument: "acoustic_grand_piano" })
                 //.or(function(){ proto.loaded(); alert('Cannot load MIDI.js!\n' + this.err()); })
                 //.and(function(){ proto.loaded(); }),
-                
-        // Azerty keyboard bindings (old version)
-        // ascii: JZZ.input.ASCII({
-        //         W:'C5', S:'C#5', X:'D5', D:'D#5', C:'E5', V:'F5',
-        //         G:'F#5', B:'G5', H:'Ab5', N:'A5', J:'Bb5', M:'B5'
-        //         }),
         
+
+  
         // QWERTY keyboard bindings - More intuitive layout
         ascii: JZZ.input.ASCII({
             '2': 'C#4', '3': 'D#4', '5': 'F#4', '6': 'G#4', '7': 'A#4','9': 'C#5', '0': 'D#5', '=': 'F#5', '-': 'G#5',
