@@ -76,13 +76,19 @@ proto = new Vue({
 
   
         // QWERTY keyboard bindings - More intuitive layout
-        ascii: JZZ.input.ASCII({
-            '2': 'C#4', '3': 'D#4', '5': 'F#4', '6': 'G#4', '7': 'A#4','9': 'C#5', '0': 'D#5', '=': 'F#5', '-': 'G#5',
-            Q: 'C4', W: 'D4', E: 'E4', R: 'F4', T: 'G4', Y: 'A4', U: 'B4',I: 'C5', O: 'D5', P: 'E5', '[': 'F5', ']': 'G5',
-            S: 'C#3', D: 'D#3', G: 'F#3', H: 'G#3', J: 'A#3', L: 'C#4',  ';': 'D#4',
-            Z: 'C3', X: 'D3', C: 'E3', V: 'F3', B: 'G3', N: 'A3', M: 'B3',',': 'C4', '.': 'D4', '/': 'E4'
-        }),
+        // ascii: JZZ.input.ASCII({
+        //     '2': 'C#4', '3': 'D#4', '5': 'F#4', '6': 'G#4', '7': 'A#4','9': 'C#5', '0': 'D#5', '=': 'F#5', '-': 'G#5',
+        //     Q: 'C4', W: 'D4', E: 'E4', R: 'F4', T: 'G4', Y: 'A4', U: 'B4',I: 'C5', O: 'D5', P: 'E5', '[': 'F5', ']': 'G5',
+        //     S: 'C#3', D: 'D#3', G: 'F#3', H: 'G#3', J: 'A#3', L: 'C#4',  ';': 'D#4',
+        //     Z: 'C3', X: 'D3', C: 'E3', V: 'F3', B: 'G3', N: 'A3', M: 'B3',',': 'C4', '.': 'D4', '/': 'E4'
+        // }),
 
+        keyStates: {},
+        layouts: window.layouts || {},       // берём глобально созданные раскладки
+        currentLayout: 'tg',
+        // currentLayout: 'qwerty',
+        ascii: null,
+        
 
         // Should trajectory drawing be active?
         trace: false,
@@ -106,6 +112,7 @@ proto = new Vue({
         //Add a watcher to connect (and disconnect) new devices to the app
         JZZ().onChange(this.deviceUpdate);
     },
+
     methods:{
         //Handler for JZZ device change event
         deviceUpdate: function({inputs:{added,removed}}){
@@ -113,8 +120,8 @@ proto = new Vue({
             if(added){
                 for(device of added){
                     JZZ().openMidiIn(device.name)
-                      .connect(midiBus.midiThru) // Send the keyboard's events to the midi bus which will relay them
-                      .connect(restartTimeout); // Reset the page's timeout upon input
+                    .connect(midiBus.midiThru) // Send the keyboard's events to the midi bus which will relay them
+                    .connect(restartTimeout); // Reset the page's timeout upon input
                     console.log('Added device: ',device);
                 }
             }
@@ -129,25 +136,95 @@ proto = new Vue({
         
         //Handler for Midi events coming from JZZ
         midiHandler: function (midiEvent){
-            noteIndex = (midiEvent.getNote()+3) %12
+            console.log('=== MIDI Event ===');
+            console.log('Type:', midiEvent.isNoteOn() ? 'NOTE_ON' : 'NOTE_OFF');
+            console.log('Note:', midiEvent.getNote(), 'Channel:', midiEvent.getChannel());
+            console.log('Velocity:', midiEvent[2]);
+            
+            noteIndex = (midiEvent.getNote()+3) %12;
+            
             if(midiEvent.isNoteOn()){
+                console.log('Before increment - note', noteIndex, 'count:', this.notes[noteIndex].count);
                 this.notes[noteIndex].count++;
+                console.log('After increment - count:', this.notes[noteIndex].count);
             }else if(midiEvent.isNoteOff()){
+                console.log('Before decrement - note', noteIndex, 'count:', this.notes[noteIndex].count);
                 if(this.notes[noteIndex].count > 0){
                     this.notes[noteIndex].count--;
                 }else{
-                    console.log('Warning: ignored unbalanced noteOff event', midiEvent);
+                    console.log('⚠️ Warning: ignored unbalanced noteOff event', midiEvent);
                 }
+                console.log('After decrement - count:', this.notes[noteIndex].count);
             }
+            
+            // Показываем общее состояние активных нот
+            let activeNotes = this.notes.filter(n => n.count > 0).map((n,i) => `${i}:${n.count}`);
+            console.log('Active notes:', activeNotes.join(', '));
         },
+
+        // Новый метод для обхода ограничений браузера на клавиатуру
+        setupKeyboardOverride: function() {
+            const self = this;
+            const layout = this.layouts[this.currentLayout];
+            
+            // Отключаем стандартный ASCII input
+            if (this.ascii) {
+                this.ascii.disconnect();
+            }
+            
+            // Создаем собственную обработку клавиатуры
+            document.addEventListener('keydown', function(e) {
+                let char = e.key;
+                
+                // Обработка цифровых клавиш
+                if (e.code.startsWith('Digit')) {
+                    char = e.key;
+                } else {
+                    char = e.key.toUpperCase();
+                }
+                
+                // Проверяем есть ли эта клавиша в раскладке
+                if (layout[char] && !self.keyStates[char]) {
+                    self.keyStates[char] = true;
+                    const note = JZZ.MIDI.noteValue(layout[char]);
+                    const midiEvent = JZZ.MIDI.noteOn(0, note, 127);
+                    midiBus.midiThru.receive(midiEvent);
+                    console.log('Direct keydown:', char, '→', layout[char]);
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('keyup', function(e) {
+                let char = e.key;
+                
+                // Обработка цифровых клавиш
+                if (e.code.startsWith('Digit')) {
+                    char = e.key;
+                } else {
+                    char = e.key.toUpperCase();
+                }
+                
+                if (layout[char] && self.keyStates[char]) {
+                    self.keyStates[char] = false;
+                    const note = JZZ.MIDI.noteValue(layout[char]);
+                    const midiEvent = JZZ.MIDI.noteOff(0, note, 127);
+                    midiBus.midiThru.receive(midiEvent);
+                    console.log('Direct keyup:', char, '→', layout[char]);
+                    e.preventDefault();
+                }
+            });
+        },
+
         resetNotes: function(){
             for (note of this.notes){
                 note.count = 0;
             }
         },
+        
         traceToggle: function(){
             this.trace = !this.trace;
         },
+        
         // Handlers for playback events fired from the app
         noteOn: function(pitches){
             //var notes = this.node2Notes(nodes);
@@ -155,12 +232,14 @@ proto = new Vue({
                 midiBus.midiThru.noteOn(0,pitch,100);
             }
         },
+        
         noteOff: function(pitches){
             //var notes = this.node2Notes(nodes);
             for (var pitch of pitches){
                 midiBus.midiThru.noteOff(0,pitch,100);
             }
         },
+        
         // Hard reset for the whole page
         reset(option) {
             if(option){
@@ -173,6 +252,16 @@ proto = new Vue({
         }
     },
     mounted(){
+
+        if (this.layouts && this.layouts[this.currentLayout]) {
+            this.ascii = JZZ.input.ASCII(this.layouts[this.currentLayout]);
+            this.ascii.connect(midiBus.midiThru);
+            //this.keyStates = {}; // Состояние всех клавиш
+            //this.setupKeyboardOverride();
+        }
+
+
+
         //Handle midiBus events
         midiBus.$on('note-on',this.noteOn);
         midiBus.$on('note-off',this.noteOff);

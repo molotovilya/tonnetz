@@ -44,6 +44,7 @@ project/
 │   ├── components/
 │   ├── decorators/
 │   ├── mixins/
+│   ├── layouts/
 │   ├── index.js
 │   ├── l12n.js
 │   ├── midiBus.js
